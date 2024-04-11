@@ -4,7 +4,7 @@ $latitude = $_POST['latitude'];
 $longitude = $_POST['longitude'];
 
 // Connect to MySQL database
-$servername = "localhost";
+$servername = "chakri-babu.github.io";
 $username = "root"; // Your MySQL username
 $password = ""; // Your MySQL password
 $dbname = "location-tracker"; // Your MySQL database name
