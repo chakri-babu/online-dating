@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Coordinates</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="mt-5 mb-3">Stored Coordinates</h1>
+
+    <div id="coordinates" class="table-responsive"></div>
+</div>
+
+<script>
+// Function to fetch coordinates from PHP script
+function getCoordinates() {
+    $.ajax({
+        url: 'get_coordinates.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            // Display coordinates in a responsive table
+            var html = '<table class="table table-striped"><thead><tr><th>Latitude</th><th>Longitude</th></tr></thead><tbody>';
+            for (var i = 0; i < data.length; i++) {
+                html += '<tr><td>' + data[i].latitude + '</td><td>' + data[i].longitude + '</td></tr>';
+            }
+            html += '</tbody></table>';
+            $('#coordinates').html(html);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching coordinates:', error);
+        }
+    });
+}
+
+// Function to continuously track user's location
+function trackLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(sendUpdatedCoordinates);
+    } else {
+        console.error("Geolocation is not supported by this browser.");
+    }
+}
+
+// Function to send updated coordinates to server
+function sendUpdatedCoordinates(position) {
+    $.ajax({
+        url: 'submit_coordinates.php',
+        type: 'POST',
+        data: { latitude: position.coords.latitude, longitude: position.coords.longitude },
+        success: function(response) {
+            console.log('Updated coordinates stored successfully');
+            getCoordinates(); // Refresh displayed coordinates
+        },
+        error: function(xhr, status, error) {
+            console.error('Error storing updated coordinates:', error);
+        }
+    });
+}
+
+// Call function to fetch coordinates when the page loads
+$(document).ready(function() {
+    getCoordinates();
+    trackLocation();
+});
+</script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

